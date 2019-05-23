@@ -41,10 +41,10 @@ pool1.on('error', err => {
     // ... error handler
 });
 
-const sqlstr = "SELECT RITB.DJH1,XM1,XB1,NL1,BGTXT,ZDJL,YSXM FROM RITB2 left join RITB on RITB2.DJH1=RITB.DJH1 ";
+const sqlstr = "SELECT PatientID,XM1,XB1,NL1,BGTXT,ZDJL,YSXM FROM RITB2 left join RITB on RITB2.DJH1=RITB.DJH1 ";
 
 async function messageHandler(datestr) {
-    const ss = sqlstr + "where ReportedDate=@datestr order by RITB.DJH1";
+    const ss = sqlstr + "where ConnectedDate=@datestr order by PatientID";
     await pool1Connect; // ensures that the pool has been created
     try {
     	const request = new sql.Request(pool1)
@@ -69,25 +69,25 @@ app.get("/api/query", function(req, res){
     f();
 });
 
-app.post("/api/pathology/:djh/make", function(req, res){
-    const djh = req.params['djh'] || '';
-    if (djh.length === 0) {
+app.post("/api/pathology/:pid/make", function(req, res){
+    const pid = req.params['pid'] || '';
+    if (pid.length === 0) {
         res.status(400).end();
         return;
     }
-    const ss = sqlstr + "where RITB2.DJH1=@djh";
+    const ss = sqlstr + "where PatientID=@pid";
     let f = async() => {
         await pool1Connect; // ensures that the pool has been created
         try {
             const request = new sql.Request(pool1)
-            const result = await request.input("djh", djh).query(ss);
+            const result = await request.input("pid", pid).query(ss);
             if (result.recordset.length > 0) {
                 const d = result.recordset[0];
                 doc.setData({
                     xm: d.XM1,
                     xb: d.XB1,
                     nl: d.NL1,
-                    djh: d.DJH1,
+                    djh: d.PatientID,
                     bgtxt: d.BGTXT,
                     zdjl: d.ZDJL,
                     ysxm: d.YSXM

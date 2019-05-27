@@ -41,7 +41,7 @@ pool1.on('error', err => {
     // ... error handler
 });
 
-const sqlstr = "SELECT PatientID,XM1,XB1,NL1,BGTXT,ZDJL,YSXM FROM RITB2 left join RITB on RITB2.DJH1=RITB.DJH1 ";
+const sqlstr = "SELECT RITB2.DJH1,PatientID,XM1,XB1,NL1,BGTXT,ZDJL,YSXM FROM RITB2 left join RITB on RITB2.DJH1=RITB.DJH1 ";
 
 async function messageHandler(datestr) {
     const ss = sqlstr + "where ConnectedDate=@datestr order by PatientID";
@@ -75,7 +75,7 @@ app.post("/api/pathology/:pid/make", function(req, res){
         res.status(400).end();
         return;
     }
-    const ss = sqlstr + "where PatientID=@pid";
+    const ss = sqlstr + "where RITB2.DJH1=@pid";
     let f = async() => {
         await pool1Connect; // ensures that the pool has been created
         try {

@@ -1,5 +1,5 @@
 {
-  "name": "h3_bl",
+  "name": "h3_bls",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -11,9 +11,10 @@
   "license": "ISC",
   "dependencies": {
     "body-parser": "^1.19.0",
-    "docxtemplater": "^3.10.1",
-    "express": "^4.17.0",
-    "jszip": "^2.6.1",
-    "mssql": "^5.1.0"
+    "docxtemplater": "^3.14.3",
+    "express": "^4.17.1",
+    "jszip": "^2",
+    "mssql": "^5.1.0",
+    "open-docxtemplater-image-module": "^1.0.3"
   }
 }

@@ -1,11 +1,24 @@
-const JSZip = require('jszip');
-const Docxtemplater = require('docxtemplater');
 const fs = require('fs');
 const path = require('path');
+const JSZip = require('jszip');
+const Docxtemplater = require('docxtemplater');
 const content = fs.readFileSync(path.resolve(__dirname, 'b.docx'), 'binary');
 const zip = new JSZip(content);
+const ImageModule = require('open-docxtemplater-image-module');
+const signaturespath = 'signatures/';
+let opts = {
+	centered: false,
+	fileType: "docx",
+	getImage: function(tagValue, tagName) {
+		return fs.readFileSync(signaturespath + tagValue);
+	},
+	getSize: function(img, tagValue, tagName) {
+		return tagValue === 'none.png' ? [1,1] : [70, 40];
+	}
+};
+const imageModule = new ImageModule(opts);
 const doc = new Docxtemplater();
-doc.loadZip(zip);
+doc.attachModule(imageModule).loadZip(zip);
 
 const express = require("express");
 const bodyParser = require("body-parser");
@@ -82,7 +95,9 @@ app.post("/api/pathology/:pid/make", function(req, res){
             const request = new sql.Request(pool1)
             const result = await request.input("pid", pid).query(ss);
             if (result.recordset.length > 0) {
-                const d = result.recordset[0];
+				const d = result.recordset[0];
+				const fn = d.YSXM + '.png';
+				const sign_exist = fs.existsSync(signaturespath + fn);
                 doc.setData({
                     xm: d.XM1,
                     xb: d.XB1,
@@ -90,7 +105,8 @@ app.post("/api/pathology/:pid/make", function(req, res){
                     djh: d.PatientID,
                     bgtxt: d.BGTXT,
                     zdjl: d.ZDJL,
-                    ysxm: d.YSXM
+					ysxm: sign_exist ? '' : d.YSXM,
+					image: sign_exist ? fn : 'none.png'
                 });
                 doc.render();
                 const buf = doc.getZip().generate({type: 'nodebuffer'});

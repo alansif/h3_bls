@@ -105,7 +105,7 @@ app.post("/api/pathology/:pid/make", function(req, res){
                     djh: d.PatientID,
                     bgtxt: d.BGTXT,
                     zdjl: d.ZDJL,
-					ysxm: sign_exist ? '' : d.YSXM,
+					ysxm: d.YSXM,
 					image: sign_exist ? fn : 'none.png'
                 });
                 doc.render();

@@ -3,7 +3,6 @@ const path = require('path');
 const JSZip = require('jszip');
 const Docxtemplater = require('docxtemplater');
 const content = fs.readFileSync(path.resolve(__dirname, 'b.docx'), 'binary');
-const zip = new JSZip(content);
 const ImageModule = require('open-docxtemplater-image-module');
 const signaturespath = 'signatures/';
 let opts = {
@@ -16,9 +15,6 @@ let opts = {
 		return tagValue === 'none.png' ? [1,1] : [70, 40];
 	}
 };
-const imageModule = new ImageModule(opts);
-const doc = new Docxtemplater();
-doc.attachModule(imageModule).loadZip(zip);
 
 const express = require("express");
 const bodyParser = require("body-parser");
@@ -98,6 +94,10 @@ app.post("/api/pathology/:pid/make", function(req, res){
 				const d = result.recordset[0];
 				const fn = d.YSXM + '.png';
 				const sign_exist = fs.existsSync(signaturespath + fn);
+                const imageModule = new ImageModule(opts);
+                const zip = new JSZip(content);
+                const doc = new Docxtemplater();
+                doc.attachModule(imageModule).loadZip(zip);
                 doc.setData({
                     xm: d.XM1,
                     xb: d.XB1,
